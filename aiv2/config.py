@@ -20,13 +20,4 @@ LLM_TEMPERATURE = float(os.environ.get("LLM_TEMPERATURE", 0))
 LLM_STREAMING = os.environ.get("LLM_STREAMING", "False").lower() == "false"
 
 # Daftar tools yang diaktifkan (untuk dynamic loading)
-ENABLED_TOOLS = os.environ.get("ENABLED_TOOLS", "Perkalian,WikipediaSearch,DateTime,KonversiSatuan,Aritmatika,JokeFetcher").split(",")
-
-# Konfigurasi dinamis untuk setiap tool
-TOOL_CONFIG = {
-    "WikipediaSearch": {
-        "language": os.environ.get("WIKIPEDIA_LANGUAGE", "id"),
-        "fallback_language": os.environ.get("WIKIPEDIA_FALLBACK_LANGUAGE", "en"),
-        "summary_length": int(os.environ.get("WIKIPEDIA_SUMMARY_LENGTH", 500))
-    }
-}
+ENABLED_TOOLS = os.environ.get("ENABLED_TOOLS", "DateTime,JokeFetcher,DokumenQA").split(",")

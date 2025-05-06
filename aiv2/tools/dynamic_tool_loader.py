@@ -3,8 +3,9 @@
 #################################################
 import logging
 import importlib
-from typing import List, Dict, Any, Callable
+from typing import List, Dict, Any, Callable, Optional
 from langchain.agents import Tool
+from pydantic import BaseModel
 from ..config import ENABLED_TOOLS
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,7 @@ class ToolRegistry:
         self.tools = {}
         self.tool_functions = {}
         
-    def register_tool(self, name: str, func: Callable, description: str) -> None:
+    def register_tool(self, name: str, func: Callable, description: str, args_schema: Optional[BaseModel] = None) -> None:
         """
         Mendaftarkan tool baru
         """
@@ -25,7 +26,8 @@ class ToolRegistry:
         self.tools[name] = Tool(
             name=name,
             func=func,
-            description=description
+            description=description,
+            args_schema=args_schema
         )
         logger.info(f"Registered tool: {name}")
         
@@ -54,16 +56,19 @@ def load_default_tools():
     """
     Mendaftarkan tools default
     """
-    # Referensikan fungsi dari modul lain
-    from .math_tools import perkalian, hitung_aritmatika
-    from .knowledge_tools import wikipedia_search
-    from .conversion_tools import konversi_satuan
     from .datetime_tools import get_datetime
     from ..utils.document_processor import load_documents
     from langchain.chains import RetrievalQA
     from langchain_ollama import OllamaLLM
     from ..config import OLLAMA_MODEL, OLLAMA_BASE_URL
     from .joke_fetcher import fetch_random_joke
+    from pydantic import BaseModel
+
+
+    # Contoh args_schema untuk tool dengan input
+    class MathInputSchema(BaseModel):
+        angka1: float
+        angka2: float
 
     tool_registry.register_tool(
         name="JokeFetcher",
@@ -73,49 +78,18 @@ def load_default_tools():
             "Cukup gunakan tool ini tanpa memasukkan input apapun. "
             "Hasil yang didapat perlu kamu kelola atau format kalimatnya menggunakan bahasa indonesia dan kalimatnya perlu kamu kembangkan "
             "terlebih dahulu sebelum ditampilkan ke pengguna."
-        )
+        ),
+        args_schema=None  # Tidak memerlukan input
     )
 
-
-    # Daftarkan tool matematika
-    tool_registry.register_tool(
-        name="Perkalian",
-        func=perkalian,
-        description="Gunakan ini untuk menghitung perkalian dua angka. Format: 'Hitung 3 dikali 1' atau '5 x 2'."
-    )
     
-    tool_registry.register_tool(
-        name="Aritmatika",
-        func=hitung_aritmatika,
-        description="Gunakan ini untuk melakukan perhitungan aritmatika sederhana seperti penjumlahan, pengurangan, pembagian, dan perpangkatan."
-    )
-    
-    # Daftarkan tool pencarian
-    tool_registry.register_tool(
-        name="WikipediaSearch",
-        func=wikipedia_search,
-        description="Gunakan ini untuk mencari informasi dari Wikipedia ketika user bertanya tentang orang (seperti Sukarno, Soekarno, Suharto), tempat, konsep, atau topik tertentu. Gunakan tool ini ketika user bertanya 'apakah kamu tahu tentang X' atau 'siapa X', ini adalah pertanyaan tentang informasi faktual."
-    )
-    
-    # Daftarkan tool konversi
-    tool_registry.register_tool(
-        name="KonversiSatuan",
-        func=konversi_satuan,
-        description="Gunakan ini untuk mengkonversi satuan (panjang, berat, suhu). Format: '5 km ke m', '10 kg ke g', '30 celsius ke fahrenheit'."
-    )
-    
-    # Daftarkan tool datetime
     tool_registry.register_tool(
         name="DateTime",
         func=get_datetime,
-        description="Use this to get the current date and time information"
-            "Simply use this tool without entering any input, Action this DateTime(). "
-            "You need to manage the results or format the sentences using Indonesian language and develop the sentences "
-            "first before displaying it to the user."     
+        description="Gunakan ini untuk mendapatkan informasi tanggal dan waktu saat ini.",
+        args_schema=None  # Tidak memerlukan input
     )
     
-    # Daftarkan tool dokumen QA
-    # Ini adalah contoh tool yang lebih kompleks yang membutuhkan inisialisasi khusus
     retriever = load_documents()
     llm = OllamaLLM(
         model=OLLAMA_MODEL, 
@@ -132,7 +106,8 @@ def load_default_tools():
     tool_registry.register_tool(
         name="DokumenQA",
         func=qa_chain.run,
-        description="Gunakan ini untuk menjawab pertanyaan berdasarkan dokumen yang telah disediakan. Gunakan ketika user bertanya tentang informasi yang mungkin ada di dalam dokumen."
+        description="Gunakan ini untuk menjawab pertanyaan berdasarkan dokumen yang telah disediakan. Gunakan ketika user bertanya tentang informasi yang mungkin ada di dalam dokumen.",
+        args_schema=None  # None Berarti tidak ada input yang diperlukan
     )
     
     return tool_registry
@@ -141,7 +116,6 @@ def get_enabled_tools() -> List[Tool]:
     """
     Mendapatkan daftar tools yang diaktifkan
     """
-    # Pastikan tools sudah dimuat
     if not tool_registry.tools:
         load_default_tools()
     

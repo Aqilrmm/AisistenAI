@@ -4,23 +4,15 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-def fetch_random_joke(_: str = "") -> str:
+def fetch_random_joke() -> dict:
     """
-    Mengambil lelucon acak dari Official Joke API.
-    Parameter input tidak digunakan tapi diterima agar kompatibel dengan pemanggilan tool.
+    Mengambil lelucon acak dari API dan mengembalikannya dalam format dictionary.
     """
     try:
-        url = "https://official-joke-api.appspot.com/random_joke"
-        response = requests.get(url)
-        data = response.json()
-
-        setup = data.get("setup", "")
-        punchline = data.get("punchline", "")
-
-        if not setup or not punchline:
-            return "Gagal mengambil lelucon."
-
-        return f"{setup}\n{punchline}"
+        response = requests.get("https://official-joke-api.appspot.com/random_joke")
+        response.raise_for_status()
+        joke = response.json()
+        return joke  # Kembalikan setup dan punchline sebagai dictionary
     except Exception as e:
-        logger.error(f"Error in fetch_random_joke: {e}")
-        return f"Terjadi kesalahan: {str(e)}"
+        logger.error(f"Error fetching joke: {e}")
+        return {"setup": "Terjadi kesalahan", "punchline": f"Kesalahan: {e}"}
