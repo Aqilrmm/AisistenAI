@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 def fetch_random_joke(none: str = None) -> dict:
     """
-    Mengambil lelucon acak dari API dan mengembalikannya dalam format dictionary.
+    Get this tool if you need to give a jokes.
     """
     try:
         response = requests.get("https://official-joke-api.appspot.com/random_joke")

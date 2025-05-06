@@ -20,7 +20,6 @@ def create_agent(tools: Optional[List[Tool]] = None) -> AgentExecutor:
             temperature=LLM_TEMPERATURE,
             streaming=LLM_STREAMING
         )
-
         if tools is None:
             tools = get_enabled_tools()
 
