@@ -27,8 +27,8 @@ Proyek ini adalah Sales AI berbahasa Indonesia yang menggunakan Ollama sebagai b
 - Python 3.8 atau lebih baru
 - Ollama terpasang dan berjalan di sistem lokal
 - Model Ollama qwen3:0.6b atau model lain yang kompatibel
-- Minimal 4GB RAM (direkomendasikan 8GB)
-- 1GB ruang disk kosong
+- Minimal 8GB RAM
+- 3GB ruang disk kosong
 
 ## 📥 Instalasi
 

@@ -4,7 +4,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-def fetch_random_joke() -> dict:
+def fetch_random_joke(none: str = None) -> dict:
     """
     Mengambil lelucon acak dari API dan mengembalikannya dalam format dictionary.
     """
